@@ -25,8 +25,13 @@ const messages = [
 socket.on('connection', (socketChannel) => {
 //подписываемся на событие client-message-sent
 // придет сообщение message
-    socketChannel.on('client-message-sent', (messages: string) => {
-        console.log(messages);
+    socketChannel.on('client-message-sent', (message: string) => {
+        console.log(message);
+        let messageItem = {message: message, id: '223jkbjk2'+ new Date().getTime(),
+            user: {id: '232323', name: 'Roman'}}
+        messages.push(messageItem)
+//socket emit новое сообщение. Все пользователи уведомляются и получают новое сообщение
+        socket.emit('new-message-sent', messageItem)
     });
     socketChannel.emit('init-messages-published', messages)
     console.log('a user connected');
