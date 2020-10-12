@@ -26,6 +26,9 @@ socket.on('connection', (socketChannel) => {
 //подписываемся на событие client-message-sent
 // придет сообщение message
     socketChannel.on('client-message-sent', (message: string) => {
+        if (typeof message !== 'string') {
+            return;
+        }
         console.log(message);
         let messageItem = {message: message, id: '223jkbjk2'+ new Date().getTime(),
             user: {id: '232323', name: 'Roman'}}
