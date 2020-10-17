@@ -14,10 +14,7 @@ app.get('/', (req, res) => {
     res.send('Hello its websocket server');
 
 });
-const messages: Array<any> = [
-    {message: 'Hello Veronica', id: '12345', user: {id: '232323', name: 'Roman'}},
-    {message: 'Hello Roman', id: '23456', user: {id: '232323', name: 'Veronica'}}
-];
+const messages: Array<any> = [];
 
 const usersState = new Map();
 //сокет подписывется на событие (on) и когда это произойдет он это узнает
@@ -34,8 +31,16 @@ socket.on('connection', (socketChannel) => {
     });
 
     socketChannel.on('client-name-sent', (name: string) => {
+        if (typeof name !== 'string') {
+            return;
+        }
         const user = usersState.get(socketChannel)
         user.name = name;
+    })
+
+    socketChannel.on('client-typing', (name: string) => {
+        //сделать рассылку кроме себя
+        socketChannel.broadcast.emit('user-typing',usersState.get(socketChannel))
     })
 
     socketChannel.on('client-message-sent', (message: string) => {
@@ -44,6 +49,7 @@ socket.on('connection', (socketChannel) => {
         }
         const user = usersState.get(socketChannel);
         console.log(message);
+
         let messageItem = {
             message: message, id: new Date().getTime().toString(),
             user: {id: user.id, name: user.name}
