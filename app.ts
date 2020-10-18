@@ -36,6 +36,7 @@ socket.on('connection', (socketChannel) => {
         }
         const user = usersState.get(socketChannel)
         user.name = name;
+        console.log(name)
     })
 
     socketChannel.on('client-typing', (name: string) => {
@@ -43,10 +44,15 @@ socket.on('connection', (socketChannel) => {
         socketChannel.broadcast.emit('user-typing',usersState.get(socketChannel))
     })
 
-    socketChannel.on('client-message-sent', (message: string) => {
+    socketChannel.on('client-message-sent', (message: string, successFn) => {
+       /* if (typeof message !== 'string' || messages.length > 20) {
+            successFn( 'message length should be less than 20 chars');
+            return;
+        }*/
         if (typeof message !== 'string') {
             return;
         }
+
         const user = usersState.get(socketChannel);
         console.log(message);
 
@@ -57,6 +63,7 @@ socket.on('connection', (socketChannel) => {
         messages.push(messageItem)
 //socket emit новое сообщение. Все пользователи уведомляются и получают новое сообщение
         socket.emit('new-message-sent', messageItem)
+        successFn(null)
     });
     socketChannel.emit('init-messages-published', messages)
     console.log('a user connected');
